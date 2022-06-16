@@ -6,6 +6,7 @@ import { ImageGallery } from 'components/ImageGallery';
 import { Button } from 'components/Button';
 import { Loader } from 'components/Loader';
 import { Section } from './App.styled';
+// import * as imageAPI from 'service/image-api';
 import { imageAPI } from 'service/image-api';
 
 export class App extends Component {
@@ -18,10 +19,8 @@ export class App extends Component {
     loading: false,
     isShowButton: false,
   };
-
   async componentDidUpdate(_, prevState) {
     const { query } = this.state;
-
     if (prevState.query !== query) {
       this.setState({
         page: 1,
@@ -30,35 +29,28 @@ export class App extends Component {
         totalHits: '',
       });
     }
-
     if (prevState.page !== this.state.page) {
       await this.getImages(query);
     }
   }
-
   getImages = async query => {
     const { page, perPage } = this.state;
     this.setState({ query, loading: true });
-
     try {
       const response = await imageAPI.fetchImage(query, page, perPage);
       const images = await response.json();
-
       if (images.hits.length === 0) {
         this.setState({
           loading: false,
           isShowButton: false,
         });
-
         throw new Error();
       }
-
       this.setState(prevState => ({
         images: [...prevState.images, ...images.hits],
         loading: false,
         isShowButton: true,
       }));
-
       if (images.hits.length < perPage || images.totalHits < perPage) {
         this.setState({
           isShowButton: false,
@@ -68,16 +60,13 @@ export class App extends Component {
       Notify.failure('Nothing found');
     }
   };
-
   onLoadMore = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
   };
-
   render() {
     const { images, isShowButton } = this.state;
-
     return (
       <Section>
         <Searchbar onSubmit={this.getImages} />
@@ -88,6 +77,7 @@ export class App extends Component {
     );
   }
 }
+
 // export function App() {
 //   const [images, setImages] = useState([]);
 //   const [page, setPage] = useState(1);
