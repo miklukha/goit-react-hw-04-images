@@ -1,17 +1,30 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Item, Image } from './ImageGalleryItem.styled';
-export function ImageGalleryItem({ image, tags, onClick, largeImg }) {
+import { Modal } from 'components/Modal';
+export function ImageGalleryItem({
+  image: { webformatURL, largeImageURL, tags },
+}) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <Item onClick={() => onClick(largeImg)}>
-      <Image src={image} alt={tags} />
-    </Item>
+    <>
+      <Item onClick={() => setIsModalOpen(true)}>
+        <Image src={webformatURL} alt={tags} />
+      </Item>
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <img src={largeImageURL} alt={tags} />
+        </Modal>
+      )}
+    </>
   );
 }
 
 ImageGalleryItem.propTypes = {
-  image: PropTypes.string.isRequired,
-  tags: PropTypes.string,
-  onClick: PropTypes.func,
-  largeImg: PropTypes.string,
+  image: PropTypes.shape({
+    webformatURL: PropTypes.string.isRequired,
+    largeImageURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+  }),
 };

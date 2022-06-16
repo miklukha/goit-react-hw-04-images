@@ -3,17 +3,11 @@ import PropTypes from 'prop-types';
 import { ImageGalleryItem } from 'components/ImageGalleryItem';
 import { Gallery } from './ImageGallery.styled';
 
-export function ImageGallery({ images, onClick }) {
+export function ImageGallery({ images }) {
   return (
     <Gallery>
-      {images.map(({ id, tags, webformatURL, largeImageURL }) => (
-        <ImageGalleryItem
-          key={id}
-          tags={tags}
-          image={webformatURL}
-          largeImg={largeImageURL}
-          onClick={onClick}
-        />
+      {images.map(image => (
+        <ImageGalleryItem key={image.id} image={image} />
       ))}
     </Gallery>
   );
