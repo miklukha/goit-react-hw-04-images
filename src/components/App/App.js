@@ -1,82 +1,176 @@
-// import { useState, useEffect } from 'react';
-import React, { Component } from 'react';
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { useState, useEffect, useRef } from 'react';
+// import React, { Component } from 'react';
+// import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { Searchbar } from 'components/Searchbar';
 import { ImageGallery } from 'components/ImageGallery';
 import { Button } from 'components/Button';
-import { Loader } from 'components/Loader';
+// import { Loader } from 'components/Loader';
 import { Section } from './App.styled';
-// import * as imageAPI from 'service/image-api';
-import { imageAPI } from 'service/image-api';
+import * as imageAPI from 'service/image-api';
 
-export class App extends Component {
-  state = {
-    images: [],
-    page: 1,
-    perPage: 12,
-    query: '',
-    largeImg: '',
-    loading: false,
-    isShowButton: false,
-  };
-  async componentDidUpdate(_, prevState) {
-    const { query } = this.state;
-    if (prevState.query !== query) {
-      this.setState({
-        page: 1,
-        images: [],
-        largeImg: '',
-        totalHits: '',
-      });
+//!!! StrictMode
+export function App() {
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
-    if (prevState.page !== this.state.page) {
-      await this.getImages(query);
-    }
-  }
-  getImages = async query => {
-    const { page, perPage } = this.state;
-    this.setState({ query, loading: true });
-    try {
-      const response = await imageAPI.fetchImage(query, page, perPage);
-      const images = await response.json();
-      if (images.hits.length === 0) {
-        this.setState({
-          loading: false,
-          isShowButton: false,
-        });
-        throw new Error();
-      }
-      this.setState(prevState => ({
-        images: [...prevState.images, ...images.hits],
-        loading: false,
-        isShowButton: true,
-      }));
-      if (images.hits.length < perPage || images.totalHits < perPage) {
-        this.setState({
-          isShowButton: false,
-        });
-      }
-    } catch (error) {
-      Notify.failure('Nothing found');
-    }
+
+    (async function getImages() {
+      const images = await imageAPI.fetchImage(query, page);
+
+      setImages(state => [...state, ...images.hits]);
+    })();
+  }, [query, page]);
+
+  const onLoadMore = () => {
+    setPage(state => state + 1);
   };
-  onLoadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-  render() {
-    const { images, isShowButton } = this.state;
-    return (
-      <Section>
-        <Searchbar onSubmit={this.getImages} />
-        {this.state.loading && <Loader />}
-        <ImageGallery images={images} />
-        {isShowButton && <Button onClick={this.onLoadMore} />}
-      </Section>
-    );
-  }
+
+  // state = {
+  //   images: [],
+  //   page: 1,
+  //   perPage: 12,
+  //   query: '',
+  //   largeImg: '',
+  //   loading: false,
+  //   isShowButton: false,
+  // };
+  // async componentDidUpdate(_, prevState) {
+  //   const { query } = this.state;
+  //   if (prevState.query !== query) {
+  //     this.setState({
+  //       page: 1,
+  //       images: [],
+  //       largeImg: '',
+  //       totalHits: '',
+  //     });
+  //   }
+  //   if (prevState.page !== this.state.page) {
+  //     await this.getImages(query);
+  //   }
+  // }
+  // getImages = async query => {
+  //   const { page, perPage } = this.state;
+  //   this.setState({ query, loading: true });
+  //   try {
+  //     const images = await imageAPI.fetchImage(query, page, perPage);
+  //     // const images = await response.json();
+  //     if (images.hits.length === 0) {
+  //       this.setState({
+  //         loading: false,
+  //         isShowButton: false,
+  //       });
+  //       throw new Error();
+  //     }
+  //     this.setState(prevState => ({
+  //       images: [...prevState.images, ...images.hits],
+  //       loading: false,
+  //       isShowButton: true,
+  //     }));
+  //     if (images.hits.length < perPage || images.totalHits < perPage) {
+  //       this.setState({
+  //         isShowButton: false,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     Notify.failure('Nothing found');
+  //     this.setState({
+  //       loading: false,
+  //     });
+  //   }
+  // };
+
+  // const { images, isShowButton } = this.state;
+  return (
+    <Section>
+      <Searchbar onSubmit={setQuery} />
+      {/* {this.state.loading && <Loader />} */}
+      <ImageGallery images={images} />
+      <Button onClick={onLoadMore} />
+      {/* {isShowButton && <Button onClick={this.onLoadMore} />} */}
+    </Section>
+  );
+  // }
 }
+
+// export class App extends Component {
+//   state = {
+//     images: [],
+//     page: 1,
+//     perPage: 12,
+//     query: '',
+//     largeImg: '',
+//     loading: false,
+//     isShowButton: false,
+//   };
+//   async componentDidUpdate(_, prevState) {
+//     const { query } = this.state;
+//     if (prevState.query !== query) {
+//       this.setState({
+//         page: 1,
+//         images: [],
+//         largeImg: '',
+//         totalHits: '',
+//       });
+//     }
+//     if (prevState.page !== this.state.page) {
+//       await this.getImages(query);
+//     }
+//   }
+//   getImages = async query => {
+//     const { page, perPage } = this.state;
+//     this.setState({ query, loading: true });
+//     try {
+//       const images = await imageAPI.fetchImage(query, page, perPage);
+//       // const images = await response.json();
+//       if (images.hits.length === 0) {
+//         this.setState({
+//           loading: false,
+//           isShowButton: false,
+//         });
+//         throw new Error();
+//       }
+//       this.setState(prevState => ({
+//         images: [...prevState.images, ...images.hits],
+//         loading: false,
+//         isShowButton: true,
+//       }));
+//       if (images.hits.length < perPage || images.totalHits < perPage) {
+//         this.setState({
+//           isShowButton: false,
+//         });
+//       }
+//     } catch (error) {
+//       Notify.failure('Nothing found');
+//       this.setState({
+//         loading: false,
+//       });
+//     }
+//   };
+//   onLoadMore = () => {
+//     this.setState(prevState => ({
+//       page: prevState.page + 1,
+//     }));
+//   };
+//   render() {
+//     const { images, isShowButton } = this.state;
+//     return (
+//       <Section>
+//         <Searchbar onSubmit={this.getImages} />
+//         {this.state.loading && <Loader />}
+//         <ImageGallery images={images} />
+//         {isShowButton && <Button onClick={this.onLoadMore} />}
+//       </Section>
+//     );
+//   }
+// }
 
 // export function App() {
 //   const [images, setImages] = useState([]);
