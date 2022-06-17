@@ -1,4 +1,3 @@
-// import React, { Component } from 'react';
 import { useState } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import PropTypes from 'prop-types';
@@ -16,7 +15,7 @@ export function Searchbar({ onSubmit }) {
   const handleSubmit = e => {
     e.preventDefault();
 
-    if (query.trim() === '') {
+    if (query === '') {
       Notify.info('Enter your query');
       return;
     }
