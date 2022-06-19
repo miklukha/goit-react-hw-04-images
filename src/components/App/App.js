@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import toast, { Toaster } from 'react-hot-toast';
 import { Searchbar } from 'components/Searchbar';
 import { ImageGallery } from 'components/ImageGallery';
 import { Button } from 'components/Button';
@@ -29,14 +29,14 @@ export function App() {
         const images = data.hits;
 
         if (images.length === 0) {
-          Notify.failure('Nothing found. Please, try again');
+          toast.error('Nothing found. Please, try again');
         }
 
         setTotalHits(data.totalHits);
         setImages(state => [...state, ...images]);
         setLoading(false);
       } catch (error) {
-        Notify.failure('Oops something wrong');
+        toast.error('Oops something wrong');
         setLoading(false);
       }
     })();
@@ -58,6 +58,7 @@ export function App() {
       <ImageGallery images={images} />
       {totalHits > page * perPage && <Button onClick={onLoadMore} />}
       {loading && <Loader />}
+      <Toaster toastOptions={{ duration: 3000 }} />
     </Section>
   );
 }

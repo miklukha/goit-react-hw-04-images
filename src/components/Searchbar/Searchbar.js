@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import toast from 'react-hot-toast';
 import PropTypes from 'prop-types';
 import { BsSearch } from 'react-icons/bs';
 import { Header, SearchForm, Button, Input } from './Searchbar.styled';
@@ -16,7 +16,7 @@ export function Searchbar({ onSubmit }) {
     e.preventDefault();
 
     if (query === '') {
-      Notify.info('Enter your query');
+      toast('Enter your query');
       return;
     }
 
